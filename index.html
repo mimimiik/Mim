@@ -1,95 +1,559 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>MIM</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icons/icon-192.png">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <meta name="theme-color" content="#8E2DE2">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="css/main.css">
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%);
+      --secondary-gradient: linear-gradient(135deg, #00B4DB 0%, #0083B0 100%);
+      --accent-gradient: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --border-light: rgba(0,0,0,0.08);
+      --bubble-my: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%);
+      --bubble-other: #f1f5f9;
+      --shadow-sm: 0 4px 6px -2px rgba(0,0,0,0.05);
+      --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.1);
+      --shadow-lg: 0 20px 35px -8px rgba(0,0,0,0.15);
+      --shadow-glow: 0 0 30px rgba(142,45,226,0.3);
+      --radius-sm: 12px;
+      --radius-md: 20px;
+      --radius-lg: 32px;
+      --transition-smooth: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    [data-theme="dark"] {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --bubble-other: #1e293b;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 10% 30%, #1a1a2e, #16213e);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      padding: 12px;
+      transition: var(--transition-smooth);
+    }
+    .phone-frame {
+      width: 100%;
+      max-width: 400px;
+      height: 780px;
+      background: var(--bg-primary);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg), 0 0 0 1px rgba(142,45,226,0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      backdrop-filter: blur(20px);
+      animation: appEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes appEnter {
+      0% { opacity: 0; transform: scale(0.92) translateY(20px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .screen { display: none; flex-direction: column; height: 100%; width: 100%; }
+    .screen.active { display: flex; }
+
+    /* Приветствие */
+    .welcome-screen { align-items: center; justify-content: center; padding: 30px; text-align: center; background: var(--bg-primary); }
+    .logo {
+      width: 100px; height: 100px; background: var(--primary-gradient);
+      border-radius: 28px; margin-bottom: 24px; display: flex;
+      align-items: center; justify-content: center; box-shadow: var(--shadow-glow);
+      animation: logoFloat 4s infinite ease-in-out;
+    }
+    @keyframes logoFloat {
+      0%,100%{ transform: translateY(0); }
+      50%{ transform: translateY(-10px); }
+    }
+    .logo i { font-size: 50px; color: white; }
+    .welcome-title {
+      font-size: 36px; font-weight: 800;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .btn {
+      padding: 16px 32px; border-radius: 60px; font-weight: 700; border: none;
+      cursor: pointer; transition: var(--transition-bounce);
+      background: var(--primary-gradient); color: white; width: 100%;
+      font-size: 18px; margin-top: 20px; box-shadow: var(--shadow-md);
+    }
+    .btn:hover { transform: scale(1.02); box-shadow: var(--shadow-glow); }
+    .youtube-link {
+      margin-top: 32px; color: var(--text-secondary); text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: var(--transition-smooth);
+    }
+    .youtube-link:hover { color: #FF0000; }
+
+    /* Авторизация */
+    .auth-header { padding: 32px 24px 16px; text-align: center; }
+    .auth-logo {
+      width: 60px; height: 60px; background: var(--primary-gradient);
+      border-radius: 20px; margin: 0 auto 20px; display: flex;
+      align-items: center; justify-content: center; box-shadow: var(--shadow-glow);
+    }
+    .auth-logo i { font-size: 30px; color: white; }
+    .auth-title {
+      font-size: 26px; font-weight: 700;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .auth-content { flex: 1; padding: 8px 24px 32px; }
+    .auth-tabs {
+      display: flex; gap: 8px; margin-bottom: 24px;
+      background: var(--bg-secondary); padding: 6px; border-radius: 60px;
+    }
+    .auth-tab {
+      flex: 1; padding: 12px; text-align: center; border-radius: 60px;
+      cursor: pointer; font-weight: 600; color: var(--text-secondary);
+      transition: var(--transition-smooth);
+    }
+    .auth-tab.active {
+      background: var(--primary-gradient); color: white; box-shadow: var(--shadow-sm);
+    }
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+    .input-wrapper {
+      background: var(--bg-secondary); border-radius: var(--radius-md);
+      padding: 4px 20px; display: flex; align-items: center;
+      border: 1.5px solid transparent; transition: var(--transition-smooth);
+      margin-bottom: 20px;
+    }
+    .input-wrapper:focus-within {
+      border-color: #8E2DE2; background: var(--bg-primary); box-shadow: var(--shadow-glow);
+    }
+    .input-wrapper input {
+      flex: 1; background: transparent; border: none; padding: 16px 0;
+      font-size: 16px; color: var(--text-primary); outline: none;
+    }
+    .code-input-container {
+      display: flex; gap: 10px; justify-content: center; margin: 24px 0;
+    }
+    .code-digit {
+      width: 50px; height: 60px; background: var(--bg-secondary);
+      border-radius: var(--radius-sm); text-align: center;
+      font-size: 28px; font-weight: 700; color: var(--text-primary);
+      border: 2px solid transparent; transition: var(--transition-smooth);
+    }
+    .code-digit:focus {
+      border-color: #8E2DE2; background: var(--bg-primary); box-shadow: var(--shadow-glow);
+      outline: none;
+    }
+    .demo-hint {
+      background: var(--bg-secondary); border-radius: 30px; padding: 12px;
+      text-align: center; margin: 16px 0; font-size: 14px;
+    }
+
+    /* Нижняя навигация */
+    .bottom-nav {
+      background: var(--bg-secondary); padding: 8px 12px calc(8px + var(--safe-bottom));
+      display: flex; justify-content: space-around; border-top: 1px solid var(--border-light);
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      color: var(--text-secondary); cursor: pointer; transition: var(--transition-bounce);
+      font-size: 11px; padding: 6px 8px; border-radius: 40px;
+    }
+    .nav-item i { font-size: 22px; }
+    .nav-item.active {
+      background: var(--primary-gradient); color: white;
+      box-shadow: var(--shadow-md); transform: translateY(-2px);
+    }
+
+    /* Общие стили контента */
+    .content-header {
+      padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .search-bar {
+      margin: 12px 20px; background: var(--bg-secondary); border-radius: 30px;
+      padding: 12px 18px; display: flex; align-items: center; gap: 10px;
+    }
+    .search-bar i { color: var(--text-secondary); }
+    .search-bar input {
+      background: transparent; border: none; flex:1; outline: none;
+      font-size: 15px; color: var(--text-primary);
+    }
+    .list-container { flex:1; overflow-y: auto; padding: 8px 16px; }
+    .list-item {
+      padding: 12px; border-radius: var(--radius-md); display: flex; gap: 14px;
+      cursor: pointer; transition: var(--transition-smooth); margin-bottom: 4px;
+      background: var(--bg-secondary);
+    }
+    .list-item:hover { transform: translateX(4px); background: var(--bg-tertiary); }
+    .avatar {
+      width: 52px; height: 52px; border-radius: 18px;
+      background: var(--secondary-gradient); display: flex;
+      align-items: center; justify-content: center; color: white; font-weight: 700;
+    }
+
+    /* Профиль */
+    .profile-header {
+      padding: 20px; display: flex; flex-direction: column; align-items: center;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .profile-avatar {
+      width: 100px; height: 100px; border-radius: 28px; background: var(--primary-gradient);
+      display: flex; align-items: center; justify-content: center; font-size: 48px;
+      color: white; margin-bottom: 12px; box-shadow: var(--shadow-glow);
+    }
+    .profile-actions {
+      display: flex; gap: 12px; margin: 16px 0;
+    }
+    .action-btn {
+      padding: 10px 18px; border-radius: 30px; background: var(--bg-secondary);
+      color: var(--text-primary); border: none; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .info-row {
+      display: flex; align-items: center; gap: 16px; padding: 16px 20px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .info-icon {
+      width: 40px; height: 40px; border-radius: 12px; background: var(--bg-secondary);
+      display: flex; align-items: center; justify-content: center; color: #8E2DE2;
+    }
+
+    /* Настройки */
+    .settings-section {
+      padding: 12px 20px; border-bottom: 1px solid var(--border-light);
+    }
+    .settings-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0; cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 <div class="phone-frame">
-  <!-- Приветственный экран -->
+  <!-- Приветствие -->
   <div class="screen welcome-screen active" id="welcomeScreen">
     <div class="logo"><i class="fas fa-comment-dots"></i></div>
     <div class="welcome-title">MIM</div>
-    <p class="welcome-subtitle">Умный мессенджер с ИИ</p>
-    <button class="btn" id="startAuthBtn">Начать общение</button>
+    <p style="margin: 12px 0 24px; color: var(--text-secondary);">Умный мессенджер с ИИ</p>
+    <button class="btn" onclick="window.startAuth()">Начать общение</button>
+    <a class="youtube-link" href="https://youtube.com/@midbed" target="_blank">
+      <i class="fab fa-youtube"></i> @midbed
+    </a>
   </div>
 
-  <!-- Экран авторизации -->
-  <div class="screen auth-screen" id="authScreen">
+  <!-- Авторизация -->
+  <div class="screen" id="authScreen">
     <div class="auth-header">
       <div class="auth-logo"><i class="fas fa-lock"></i></div>
       <div class="auth-title">Вход</div>
     </div>
     <div class="auth-content">
       <div class="auth-tabs">
-        <div class="auth-tab active" data-tab="phone">Телефон</div>
-        <div class="auth-tab" data-tab="login">Логин</div>
+        <div class="auth-tab active" onclick="window.switchAuthTab('phone')">Телефон</div>
+        <div class="auth-tab" onclick="window.switchAuthTab('login')">Логин</div>
       </div>
       <div class="auth-form active" id="phoneForm">
         <div class="input-wrapper">
-          <span>+7</span>
+          <span style="margin-right:10px;">+7</span>
           <input type="tel" id="phoneInput" placeholder="999 123-45-67" value="9991234567">
         </div>
-        <button class="btn" id="requestCodeBtn">Получить код</button>
+        <button class="btn" onclick="window.requestCode()">Получить код</button>
         <div class="demo-hint">Демо: код появится на следующем экране</div>
       </div>
       <div class="auth-form" id="loginForm">
         <div class="input-wrapper">
-          <i class="fas fa-user"></i>
+          <i class="fas fa-user" style="margin-right:12px;"></i>
           <input type="text" id="loginUsername" placeholder="Логин" value="demo">
         </div>
         <div class="input-wrapper">
-          <i class="fas fa-lock"></i>
+          <i class="fas fa-lock" style="margin-right:12px;"></i>
           <input type="password" id="loginPassword" placeholder="Пароль" value="123456">
         </div>
-        <button class="btn" id="loginBtn">Войти</button>
+        <button class="btn" onclick="window.loginWithPassword()">Войти</button>
       </div>
-      <p class="auth-footer"><a href="#" id="backToWelcomeLink">← На главную</a></p>
+      <p style="text-align:center; margin-top:16px;"><a href="#" onclick="window.backToWelcome()" style="color:#8E2DE2;">← На главную</a></p>
     </div>
   </div>
 
-  <!-- Экран подтверждения кода -->
-  <div class="screen code-screen" id="codeScreen">
+  <!-- Код подтверждения -->
+  <div class="screen" id="codeScreen">
     <div class="auth-header">
       <div class="auth-logo"><i class="fas fa-key"></i></div>
       <div class="auth-title">Код</div>
-      <p id="codeHint">Мы отправили SMS</p>
+      <p class="auth-subtitle" id="codeHint">Мы отправили SMS</p>
     </div>
     <div class="auth-content">
       <div class="code-input-container">
-        <input type="text" class="code-digit" maxlength="1">
-        <input type="text" class="code-digit" maxlength="1">
-        <input type="text" class="code-digit" maxlength="1">
-        <input type="text" class="code-digit" maxlength="1">
+        <input type="text" class="code-digit" maxlength="1" oninput="window.moveToNext(this)">
+        <input type="text" class="code-digit" maxlength="1" oninput="window.moveToNext(this)">
+        <input type="text" class="code-digit" maxlength="1" oninput="window.moveToNext(this)">
+        <input type="text" class="code-digit" maxlength="1" oninput="window.moveToNext(this)">
       </div>
       <div class="timer" id="timer">Отправить повторно через 0:59</div>
       <div class="demo-hint">Демо-код: <strong id="demoCodeDisplay">1234</strong></div>
-      <button class="btn" id="verifyCodeBtn">Подтвердить</button>
-      <p class="auth-footer"><a href="#" id="backToPhoneLink">Изменить номер</a></p>
+      <button class="btn" onclick="window.verifyCode()">Подтвердить</button>
+      <p style="text-align:center; margin-top:16px;"><a href="#" onclick="window.backToPhone()" style="color:#8E2DE2;">Изменить номер</a></p>
     </div>
   </div>
 
-  <!-- Основной экран -->
-  <div class="screen main-screen" id="mainScreen">
-    <div id="tabContent" class="tab-content"></div>
-    <div class="bottom-nav" id="bottomNav">
-      <div class="nav-item active" data-tab="chats"><i class="fas fa-comment"></i><span>Чаты</span></div>
-      <div class="nav-item" data-tab="contacts"><i class="fas fa-address-book"></i><span>Контакты</span></div>
-      <div class="nav-item" data-tab="settings"><i class="fas fa-sliders-h"></i><span>Настройки</span></div>
-      <div class="nav-item" data-tab="profile"><i class="fas fa-user"></i><span>Профиль</span></div>
+  <!-- Основной экран с 4 вкладками -->
+  <div class="screen" id="mainScreen">
+    <div id="tabContent" style="flex:1; display:flex; flex-direction:column; overflow:hidden;"></div>
+    <div class="bottom-nav">
+      <div class="nav-item active" data-tab="chats" onclick="window.switchTab('chats')"><i class="fas fa-comment"></i><span>Чаты</span></div>
+      <div class="nav-item" data-tab="contacts" onclick="window.switchTab('contacts')"><i class="fas fa-address-book"></i><span>Контакты</span></div>
+      <div class="nav-item" data-tab="settings" onclick="window.switchTab('settings')"><i class="fas fa-sliders-h"></i><span>Настройки</span></div>
+      <div class="nav-item" data-tab="profile" onclick="window.switchTab('profile')"><i class="fas fa-user"></i><span>Профиль</span></div>
     </div>
   </div>
 </div>
 
-<script type="module" src="js/app.js"></script>
+<script>
+  // ---------- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ----------
+  window.demoCode = '1234';
+  window.currentChat = null;
+  window.chats = [
+    { id: 'ai', name: 'MIM Ассистент', avatar: '🤖', type: 'ai', lastMsg: 'Привет! Я MIM...', time: '10:00' },
+    { id: 'friend1', name: 'Анна', avatar: 'А', type: 'user', lastMsg: 'Привет! Как дела?', time: '14:20' },
+    { id: 'friend2', name: 'Кирилл', avatar: 'К', type: 'user', lastMsg: '🐾 Стикер', time: '27 мар' },
+    { id: 'archive', name: 'Архив', avatar: '📦', type: 'archive', lastMsg: '6 чатов', time: '' }
+  ];
+  window.contacts = [
+    { name: 'МАма', avatar: '👩', status: 'был(а) 05 апр. в 18:41' },
+    { name: 'Доставка Т-Банк', avatar: '🏦', status: 'был(а) недавно' },
+    { name: 'Никита Па', avatar: '👤', status: 'был(а) в этом месяце' }
+  ];
+
+  // Инициализация хранилища
+  if (!localStorage.getItem('mime_messages')) {
+    localStorage.setItem('mime_messages', JSON.stringify({
+      'ai': [{ text: 'Привет! Я MIM, твой умный помощник на базе DeepSeek. Задай любой вопрос!', type: 'other', time: '10:00' }],
+      'friend1': [{ text: 'Привет! Как дела?', type: 'other', time: '14:20' }],
+      'friend2': [],
+      'archive': []
+    }));
+  }
+
+  // ---------- УПРАВЛЕНИЕ ЭКРАНАМИ ----------
+  window.showScreen = (id) => {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  };
+  window.startAuth = () => window.showScreen('authScreen');
+  window.backToWelcome = () => window.showScreen('welcomeScreen');
+  window.backToPhone = () => window.showScreen('authScreen');
+  window.switchAuthTab = (tab) => {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+    if (tab === 'phone') {
+      document.querySelector('.auth-tab:first-child').classList.add('active');
+      document.getElementById('phoneForm').classList.add('active');
+    } else {
+      document.querySelector('.auth-tab:last-child').classList.add('active');
+      document.getElementById('loginForm').classList.add('active');
+    }
+  };
+
+  // Авторизация
+  window.requestCode = () => {
+    const phone = document.getElementById('phoneInput').value;
+    if (phone.length < 10) { alert('Введите номер'); return; }
+    window.demoCode = Math.floor(1000 + Math.random() * 9000).toString();
+    document.getElementById('demoCodeDisplay').textContent = window.demoCode;
+    document.getElementById('codeHint').innerHTML = `Мы отправили SMS на +7 ${phone}`;
+    window.showScreen('codeScreen');
+    window.startTimer(59);
+  };
+  window.startTimer = (s) => {
+    let time = s; const el = document.getElementById('timer');
+    const int = setInterval(() => {
+      if (time <= 0) { clearInterval(int); el.innerHTML = '<a href="#" onclick="window.requestCode()" style="color:#8E2DE2;">Отправить снова</a>'; return; }
+      let m = Math.floor(time/60), sec = time%60;
+      el.textContent = `Отправить повторно через ${m}:${sec.toString().padStart(2,'0')}`;
+      time--;
+    }, 1000);
+  };
+  window.moveToNext = (input) => { if(input.value.length===1) input.nextElementSibling?.focus(); };
+  window.verifyCode = () => {
+    const digits = Array.from(document.querySelectorAll('.code-digit')).map(d => d.value).join('');
+    if (digits === window.demoCode) { window.showScreen('mainScreen'); window.switchTab('chats'); }
+    else alert('Неверный код. Попробуйте ' + window.demoCode);
+  };
+  window.loginWithPassword = () => {
+    const u = document.getElementById('loginUsername').value, p = document.getElementById('loginPassword').value;
+    if(u && p) { window.showScreen('mainScreen'); window.switchTab('chats'); }
+    else alert('Введите логин и пароль');
+  };
+
+  // Переключение вкладок
+  window.switchTab = (tab) => {
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
+    const content = document.getElementById('tabContent');
+    if (tab === 'chats') window.renderChats(content);
+    else if (tab === 'contacts') window.renderContacts(content);
+    else if (tab === 'settings') window.renderSettings(content);
+    else if (tab === 'profile') window.renderProfile(content);
+  };
+
+  // Рендер чатов
+  window.renderChats = (content) => {
+    content.innerHTML = `
+      <div class="content-header"><h2>Чаты</h2><i class="fas fa-edit" style="color:#8E2DE2;"></i></div>
+      <div class="search-bar"><i class="fas fa-search"></i><input placeholder="Поиск"></div>
+      <div class="list-container" id="chatList"></div>
+    `;
+    const list = document.getElementById('chatList');
+    list.innerHTML = window.chats.map(c => `
+      <div class="list-item" onclick="window.openChat('${c.id}')">
+        <div class="avatar" style="background:${c.type==='ai'?'var(--primary-gradient)':'var(--secondary-gradient)'}">${c.avatar}</div>
+        <div style="flex:1"><strong>${c.name}</strong><p style="color:var(--text-secondary);font-size:14px;">${c.lastMsg}</p></div>
+        <span style="font-size:12px;color:var(--text-secondary);">${c.time}</span>
+      </div>
+    `).join('');
+  };
+
+  window.openChat = (id) => {
+    window.currentChat = id;
+    const chat = window.chats.find(c => c.id === id);
+    const content = document.getElementById('tabContent');
+    content.innerHTML = `
+      <div class="content-header">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <i class="fas fa-arrow-left" onclick="window.switchTab('chats')" style="cursor:pointer;"></i>
+          <div class="avatar" style="width:40px;height:40px;">${chat.avatar}</div>
+          <div><h3>${chat.name}</h3><span style="font-size:12px;">${chat.type==='ai'?'ИИ онлайн':'был(а) недавно'}</span></div>
+        </div>
+        <i class="fas fa-phone" style="color:#8E2DE2;"></i>
+      </div>
+      <div class="list-container" id="msgContainer" style="display:flex;flex-direction:column;gap:12px;"></div>
+      <div style="padding:12px;display:flex;gap:8px;border-top:1px solid var(--border-light);">
+        <input id="msgInput" placeholder="Сообщение..." style="flex:1;padding:12px;border-radius:30px;border:1px solid var(--border-light);">
+        <button class="btn" style="width:auto;margin:0;" onclick="window.sendMessage()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    `;
+    window.renderMessages();
+  };
+  window.renderMessages = () => {
+    const msgs = JSON.parse(localStorage.getItem('mime_messages'))[window.currentChat] || [];
+    const cont = document.getElementById('msgContainer');
+    cont.innerHTML = msgs.map(m => `
+      <div style="display:flex;justify-content:${m.type==='my'?'flex-end':'flex-start'};">
+        <div style="max-width:75%;padding:12px;border-radius:22px;background:${m.type==='my'?'var(--bubble-my)':'var(--bubble-other)'};color:${m.type==='my'?'white':'var(--text-primary)'}">
+          ${m.text}<div style="font-size:10px;opacity:0.7;margin-top:4px;">${m.time}</div>
+        </div>
+      </div>
+    `).join('');
+  };
+  window.sendMessage = () => {
+    const inp = document.getElementById('msgInput'); const text = inp.value.trim(); if(!text) return;
+    const msgs = JSON.parse(localStorage.getItem('mime_messages'));
+    const time = new Date().toLocaleTimeString().slice(0,5);
+    msgs[window.currentChat].push({text, type:'my', time});
+    localStorage.setItem('mime_messages', JSON.stringify(msgs));
+    window.renderMessages(); inp.value = '';
+    
+    // Ответ от ИИ через DeepSeek API
+    if(window.currentChat === 'ai') {
+      const container = document.getElementById('msgContainer');
+      const typingDiv = document.createElement('div');
+      typingDiv.id = 'typingIndicator';
+      typingDiv.style.cssText = 'padding:12px; color:var(--text-secondary); font-style:italic;';
+      typingDiv.innerHTML = '🤖 MIM печатает...';
+      container.appendChild(typingDiv);
+      container.scrollTop = container.scrollHeight;
+
+      fetch('/api/deepseek', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('typingIndicator')?.remove();
+        const reply = data.reply || 'Извините, ИИ временно недоступен.';
+        msgs[window.currentChat].push({text: reply, type:'other', time: new Date().toLocaleTimeString().slice(0,5)});
+        localStorage.setItem('mime_messages', JSON.stringify(msgs));
+        window.renderMessages();
+      })
+      .catch(err => {
+        document.getElementById('typingIndicator')?.remove();
+        msgs[window.currentChat].push({text: 'Ошибка связи с ИИ.', type:'other', time: new Date().toLocaleTimeString().slice(0,5)});
+        localStorage.setItem('mime_messages', JSON.stringify(msgs));
+        window.renderMessages();
+      });
+    }
+  };
+
+  // Контакты
+  window.renderContacts = (content) => {
+    content.innerHTML = `
+      <div class="content-header"><h2>Контакты</h2><i class="fas fa-user-plus" style="color:#8E2DE2;"></i></div>
+      <div class="search-bar"><i class="fas fa-search"></i><input placeholder="Поиск"></div>
+      <div class="list-container">
+        <div class="list-item" onclick="alert('Пригласить')"><i class="fas fa-user-plus" style="margin-right:12px;"></i>Пригласить друзей</div>
+        <div class="list-item" onclick="alert('Звонки')"><i class="fas fa-phone-alt" style="margin-right:12px;"></i>Недавние звонки</div>
+        <div style="margin:16px 0 8px;font-weight:600;">Сортировка по времени захода</div>
+        ${window.contacts.map(c => `
+          <div class="list-item">
+            <div class="avatar" style="width:40px;height:40px;">${c.avatar}</div>
+            <div><strong>${c.name}</strong><br><span style="color:var(--text-secondary);">${c.status}</span></div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  };
+
+  // Настройки
+  window.renderSettings = (content) => {
+    content.innerHTML = `
+      <div class="content-header"><h2>Настройки</h2></div>
+      <div class="list-container">
+        ${['Аккаунт','Настройки чатов','Конфиденциальность','Уведомления','Данные и память','Папки с чатами','Устройства','Энергосбережение','Язык'].map(s => `
+          <div class="settings-row" onclick="alert('${s}')"><span>${s}</span><i class="fas fa-chevron-right"></i></div>
+        `).join('')}
+      </div>
+    `;
+  };
+
+  // Профиль
+  window.renderProfile = (content) => {
+    content.innerHTML = `
+      <div class="profile-header">
+        <div class="profile-avatar">😎</div>
+        <h2>Алексей</h2>
+        <p style="color:var(--text-secondary);">@alex_ai</p>
+        <div class="profile-actions">
+          <button class="action-btn"><i class="fas fa-camera"></i> Фото</button>
+          <button class="action-btn"><i class="fas fa-pen"></i> Изменить</button>
+          <button class="action-btn"><i class="fas fa-cog"></i> Настройки</button>
+        </div>
+      </div>
+      <div class="list-container">
+        <div class="info-row"><div class="info-icon"><i class="fas fa-phone"></i></div><div>+7 (919) 045-24-92 <span style="color:#8E2DE2;margin-left:12px;">Телефон</span></div></div>
+        <div class="info-row"><div class="info-icon"><i class="fas fa-at"></i></div><div>@MIDBEU <span style="color:#8E2DE2;margin-left:12px;">Имя пользователя</span></div></div>
+        <div class="info-row"><div class="info-icon"><i class="fas fa-calendar"></i></div><div>19 сент. 2000 (25 лет) <span style="color:#8E2DE2;margin-left:12px;">День рождения</span></div></div>
+        <div class="settings-row" onclick="alert('Публикации')"><span>Публикации</span><i class="fas fa-chevron-right"></i></div>
+        <div class="settings-row" onclick="alert('Архив')"><span>Архив публикаций</span><i class="fas fa-chevron-right"></i></div>
+        <button class="btn" style="margin:20px;">Добавить</button>
+      </div>
+    `;
+  };
+</script>
 </body>
 </html>
